@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Philly BikeShare</title>
+    <button type="button" name="button" onclick="getLoc()">Get Location and Find Closest Station</button>
+    <div id="container">
+      <div id="address"></div>
+      <div id="bikes"></div>
+    </div>
+  </head>
+  <style media="screen">
+    body {
+      max-width: 600px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button {
+      display: block;
+      font-size: 36px;
+      padding-right: 5px;
+      padding-left: 5px;
+      padding-bottom: 10px;
+      padding-top: 10px;
+      border-color: lightblue;
+      border-size: 3px;
+      background-color: lightblue;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+  <body>
+  <script type="text/javascript">
+  function getLoc() {
+    const address = document.getElementById('address');
+    const bikes = document.getElementById('bikes');
+    const currentLocation = navigator.geolocation.getCurrentPosition(success, error);
+
+    let lat;
+    let long;
+
+    function success(position) {
+      lat = position.coords.latitude;
+      long = position.coords.longitude;
+      getTheBikeShare();
+    };
+
+    function getTheBikeShare() {
+      fetch('http://api.citybik.es/v2/networks/indego').then(function(response) {
+        return response.json();
+      }).then(function(response) {
+        closeStation(lat, long, response.network.stations)
+      })
+    }
+
+    function howClose(value) {
+      let newLat = lat + 0.007282400000001132;
+      let otherLat = lat - 0.007282400000001132;
+      let newLong = long - 0.007928500000005556;
+      let otherLong = long + 0.007928500000005556;
+      if ((value.latitude < newLat) && (value.longitude > newLong)) {
+        return value;
+      }
+
+    }
+
+    function closeStation(lat, long, stations) {
+        var closest = stations.filter(howClose);
+        closest.forEach((element) => {
+          var stationInfo = document.createElement('div')
+          stationInfo.classname = `station${element}`;
+          address.append(stationInfo);
+          stationInfo.innerHTML = `<p>${element.extra.address}</p>`;
+          stationInfo.append(`\n Free Bikes: ${closest[0].free_bikes} \n Empty Slots: ${closest[0].empty_slots}`);
+        })
+        // address.innerHTML = closest[0].extra.address;
+        // bikes.innerHTML = `Free Bikes: ${closest[0].free_bikes} <p>Empty Slots: ${closest[0].empty_slots}</p>`
+        return closest;
+    }
+
+    function error() {
+      console.log('error');
+    };
+
+    if ("geolocation" in navigator) {
+      currentLocation;
+    } else {
+      console.log('nah');
+    }
+  };
+  </script>
+  </body>
+</html>
