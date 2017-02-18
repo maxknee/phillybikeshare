@@ -57,7 +57,7 @@
     };
 
     function getTheBikeShare() {
-      fetch('http://api.citybik.es/v2/networks/indego').then(function(response) {
+      fetch('https://api.citybik.es/v2/networks/indego').then(function(response) {
         return response.json();
       }).then(function(response) {
         closeStation(lat, long, response.network.stations)
