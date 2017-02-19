@@ -72,24 +72,27 @@
       if ((value.latitude < newLat) && (value.longitude > newLong)) {
         return value;
       }
-
     }
 
     function closeStation(lat, long, stations) {
-        var closest = stations.filter(howClose);
-        closest.forEach((element) => {
-          var stationInfo = document.createElement('div')
-          stationInfo.classname = `station${element}`;
-          address.append(stationInfo);
-          stationInfo.innerHTML = `<p>${element.extra.address}</p>`;
-          stationInfo.append(`\n Free Bikes: ${closest[0].free_bikes} \n Empty Slots: ${closest[0].empty_slots}`);
-        })
-        // address.innerHTML = closest[0].extra.address;
-        // bikes.innerHTML = `Free Bikes: ${closest[0].free_bikes} <p>Empty Slots: ${closest[0].empty_slots}</p>`
+        let closest = stations.filter(howClose);
+
+        if (closest) {
+          closest.forEach((element) => {
+            let stationInfo = document.createElement('div')
+            stationInfo.classname = `station${element}`;
+            address.append(stationInfo);
+            stationInfo.innerHTML = `<p>${element.extra.address}</p>`;
+            stationInfo.append(`\n Free Bikes: ${closest[0].free_bikes} \n Empty Slots: ${closest[0].empty_slots}`);
+          });
+        } else {
+          address.innerHTML = 'No stations close';
+        }
         return closest;
     }
 
     function error() {
+      address.innerHTML = `<p>Sorry Unable to get your location</p>`;
       console.log('error');
     };
 
